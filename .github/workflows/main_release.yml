@@ -20,7 +20,7 @@ jobs:
         uses: ohoareau/actions/npmrc-scope-authtoken-add@master
         with:
             scope: genstackio
-            token: ${{secrets.CUSTOM_NPM_TOKEN}}
+            token: ${{secrets.NPM_TOKEN}}
       - name: Install
         shell: 'script -q -e -c "bash {0}"'
         run: make install
