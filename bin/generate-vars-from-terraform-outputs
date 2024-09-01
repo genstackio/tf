@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+process.stdout.write(
+    require(`${__dirname}/../lib/commands/generateVarsFromTerraformOutputs.js`).default(
+        process.argv[3],
+        (process.argv[2].indexOf('/') >= 0) ? process.argv[2] : `../outputs/${process.argv[2]}`
+    )
+);

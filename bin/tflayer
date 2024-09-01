@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+const [,, env, action, layerNameString, ...actionArgs] = process.argv;
+
+require(`${__dirname}/../lib/commands/tflayer.js`).default({env, action, layerNameString, actionArgs, targetDir: `${process.cwd()}/environments`}).then(() => {}).catch(e => {
+    console.error(e.message);
+    process.exit(1);
+});

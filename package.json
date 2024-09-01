@@ -1,0 +1,59 @@
+{
+  "name": "@genstackio/tf",
+  "version": "0.0.0",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "description": "TF wrapper",
+  "author": {
+    "name": "Olivier Hoareau",
+    "email": "oha+oss@greenberets.io"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test",
+    "bin": "bin"
+  },
+  "files": [
+    "lib",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint --color",
+    "format": "prettier --write 'src/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts'",
+    "test": "jest",
+    "test:unit": "jest",
+    "test:unit:cov": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/jest": "^29.5.12",
+    "eslint": "^9.9.0",
+    "globals": "^15.9.0",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "semantic-release": "^24.1.0",
+    "ts-jest": "^29.2.4",
+    "ts-node": "^10.9.2",
+    "typescript-eslint": "^8.1.0",
+    "prettier": "^3.3.3"
+  },
+  "dependencies": {
+    "@types/node": "^20.16.3",
+    "typescript": "^5.5.4",
+    "handlebars": "^4.7.6"
+  },
+  "bin": {
+    "tfgen": "./bin/tfgen",
+    "tflayer": "./bin/tflayer",
+    "generate-vars-from-terraform-outputs": "./bin/generate-vars-from-terraform-outputs"
+  }
+}
