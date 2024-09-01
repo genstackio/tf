@@ -1,12 +1,26 @@
 import {layer_run, loggable, logger_factory, raw_logger} from '../types';
 
 export default async (run: layer_run) => {
-    await run(['terraform', 'output', '-json', '-no-color'], createLogger, true);
-}
+    await run(
+        ['terraform', 'output', '-json', '-no-color'],
+        createLogger,
+        true,
+    );
+};
 
 const createLogger: logger_factory = (rawLogger: raw_logger) => {
     const messagesBuffer: (loggable | string)[] = [];
-    return ({ group, type, data, error }: { group :string; type: string, data: unknown; error?: boolean }) => {
+    return ({
+        group,
+        type,
+        data,
+        error,
+    }: {
+        group: string;
+        type: string;
+        data: unknown;
+        error?: boolean;
+    }) => {
         switch (type) {
             case 'message':
                 if (error) {
@@ -16,7 +30,12 @@ const createLogger: logger_factory = (rawLogger: raw_logger) => {
                 }
                 break;
             case 'completed':
-                console.log(JSON.stringify({id: group, variables: JSON.parse(messagesBuffer.join("\n"))}));
+                console.log(
+                    JSON.stringify({
+                        id: group,
+                        variables: JSON.parse(messagesBuffer.join('\n')),
+                    }),
+                );
                 break;
             default:
         }

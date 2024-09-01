@@ -18,17 +18,45 @@ export type layer_config = {
 };
 
 export type loggable = {
-    group :string;
-    type: string,
+    group: string;
+    type: string;
     data: unknown;
     error?: boolean;
 };
 
-export type raw_logger = ({group, type, data, error}: { group: string; type: string; data: unknown; error?: boolean }) => void;
-export type logger = ({group, type, data, error}: { group: string; type: string; data: unknown; error?: boolean }) => void;
+export type raw_logger = ({
+    group,
+    type,
+    data,
+    error,
+}: {
+    group: string;
+    type: string;
+    data: unknown;
+    error?: boolean;
+}) => void;
+export type logger = ({
+    group,
+    type,
+    data,
+    error,
+}: {
+    group: string;
+    type: string;
+    data: unknown;
+    error?: boolean;
+}) => void;
 export type logger_factory = (rawLogger: raw_logger) => logger;
 
-export type layer_run = (args: string[], loggerFactory?: logger_factory, silent?: boolean) => Promise<void>;
+export type layer_run = (
+    args: string[],
+    loggerFactory?: logger_factory,
+    silent?: boolean,
+) => Promise<void>;
 export type layer_action = (run: layer_run, layer: layer) => Promise<void>;
 
-export type fetch_layer = (root: string, env: string, name: string) => Promise<[ Record<string, string>, string ]>;
+export type fetch_layer = (
+    root: string,
+    env: string,
+    name: string,
+) => Promise<[Record<string, string>, string]>;
