@@ -15,6 +15,12 @@ export type config = {
 export type layer_config = {
     only_on_envs?: string[];
     not_on_envs?: string[];
+    envs?: Record<string, unknown>;
+};
+
+export type enriched_layer_config = {
+    defaultRegion: string;
+    regions?: string[];
 };
 
 export type loggable = {
@@ -61,3 +67,11 @@ export type fetch_layer = (
     env: string,
     name: string,
 ) => Promise<[Record<string, string>, string]>;
+
+export type fetched_layer = {
+    name: string;
+    file: string;
+    filePath: string;
+};
+
+export type fetch_config = (configFile: string) => Promise<config>;

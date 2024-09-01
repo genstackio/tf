@@ -6,7 +6,7 @@ import getDirectories from '../src/utils/getDirectories';
 beforeEach(() => {
     jest.resetAllMocks();
 })
-describe('tflayer', () => {
+describe('list-layers', () => {
     it('no directories outputs empty string', async () => {
         const logger = jest.fn();
         (getDirectories as jest.Mock<unknown>).mockImplementation(() => []);
