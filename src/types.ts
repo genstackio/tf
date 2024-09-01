@@ -35,6 +35,7 @@ export type raw_logger = ({
     data: unknown;
     error?: boolean;
 }) => void;
+
 export type logger = ({
     group,
     type,
