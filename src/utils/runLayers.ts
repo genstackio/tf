@@ -1,5 +1,6 @@
 import runLayer from "./runLayer";
 import buildLayers from "./buildLayers";
+import {fetch_layer} from "../types";
 
 const actions: Record<string, { executeDepends?: boolean; executeRequires?: boolean }> = {
     init: {executeDepends: false},
@@ -12,8 +13,8 @@ const actions: Record<string, { executeDepends?: boolean; executeRequires?: bool
     destroy: {executeRequires: true, executeDepends: true},
 };
 
-export const runLayers = async (root: string, env: string, layerNames: string[], action: string, _: Record<string, unknown> = {}, opts: { transitive?: boolean } = {}) => {
-    const layers = await buildLayers(root, env);
+export const runLayers = async (root: string, env: string, layerNames: string[], action: string, fetchLayer: fetch_layer, _: Record<string, unknown> = {}, opts: { transitive?: boolean } = {}) => {
+    const layers = await buildLayers(root, env, fetchLayer);
     const allMode = !!layerNames.find(n => n === 'all');
     layerNames = allMode ? layers.map(l => l.name) : layerNames;
     layerNames = layerNames.reduce((acc, ln) => {

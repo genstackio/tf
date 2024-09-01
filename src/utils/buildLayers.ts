@@ -2,10 +2,10 @@ import getDirectories from "./getDirectories";
 import buildLayer from "./buildLayer";
 import buildLayerRequires from "./buildLayerRequires";
 import buildLayerDepends from "./buildLayerDepends";
-import {layer} from "../types";
+import {fetch_layer, layer} from "../types";
 
-export const buildLayers = async (root: string, env: string) => {
-    const layers = await Promise.all<layer>(getDirectories(`${root}/${env}`).map(async (l: string) => buildLayer(root, env, l)));
+export const buildLayers = async (root: string, env: string, fetchLayer: fetch_layer) => {
+    const layers = await Promise.all<layer>(getDirectories(`${root}/${env}`).map(async (l: string) => buildLayer(root, env, l, fetchLayer)));
     const sorted = (await Promise.all(layers.map(async l => {
         const requires = await buildLayerRequires(l, layers);
         const depends = await buildLayerDepends(l, layers);

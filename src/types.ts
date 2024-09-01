@@ -30,3 +30,5 @@ export type logger_factory = (rawLogger: raw_logger) => logger;
 
 export type layer_run = (args: string[], loggerFactory?: logger_factory, silent?: boolean) => Promise<void>;
 export type layer_action = (run: layer_run, layer: layer) => Promise<void>;
+
+export type fetch_layer = (root: string, env: string, name: string) => Promise<[ Record<string, string>, string ]>;
