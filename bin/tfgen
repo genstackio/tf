@@ -2,7 +2,7 @@
 
 const [,, configFile, sourceDir, targetDir] = process.argv;
 
-require(`${__dirname}/../lib/index.js`).tfgen(configFile, sourceDir, targetDir).then(() => {}).catch(e => {
+require(`${__dirname}/../lib/commads/tfgen.js`).default(configFile, sourceDir, targetDir).then(() => {}).catch(e => {
     console.error(e.message);
     process.exit(1);
 });
