@@ -1,0 +1,47 @@
+name: "Release main"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prepare Node.js (20.x)
+        uses: actions/setup-node@v4
+        with:
+            node-version: 20.x
+            cache: yarn
+      - name: Prepare NPM Registry identity
+        uses: ohoareau/actions/npmrc-scope-authtoken-add@master
+        with:
+            scope: genstackio
+            token: ${{secrets.CUSTOM_NPM_TOKEN}}
+      - name: Install
+        shell: 'script -q -e -c "bash {0}"'
+        run: make install
+        env: { FORCE_COLOR: 3, CI: true }
+      - name: Test
+        shell: 'script -q -e -c "bash {0}"'
+        run: make test
+        env: { FORCE_COLOR: 3, CI: true }
+      - name: Lint
+        shell: 'script -q -e -c "bash {0}"'
+        run: make lint
+        env: { FORCE_COLOR: 3, CI: true }
+      - name: Format (check only)
+        shell: 'script -q -e -c "bash {0}"'
+        run: make format-check
+        env: { FORCE_COLOR: 3, CI: true }
+      - name: Build
+        shell: 'script -q -e -c "bash {0}"'
+        run: make build
+        env: { FORCE_COLOR: 3, CI: true }
+      - name: Publish (only)
+        shell: 'script -q -e -c "bash {0}"'
+        run: make publish-only
+        env: { FORCE_COLOR: 3, CI: true, GITHUB_TOKEN: '${{secrets.CUSTOM_GITHUB_TOKEN}}' }
