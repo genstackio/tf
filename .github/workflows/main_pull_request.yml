@@ -21,6 +21,7 @@ jobs:
         with:
             scope: genstackio
             token: ${{secrets.NPM_TOKEN}}
+            registry: registry.npmjs.org
       - name: Install
         shell: 'script -q -e -c "bash {0}"'
         run: make install

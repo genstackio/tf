@@ -55,10 +55,5 @@
     "tfgen": "./bin/tfgen",
     "tflayer": "./bin/tflayer",
     "generate-vars-from-terraform-outputs": "./bin/generate-vars-from-terraform-outputs"
-  },
-  "release": {
-    "branches": [
-      "main"
-    ]
   }
 }
