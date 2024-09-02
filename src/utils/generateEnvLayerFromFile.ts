@@ -11,10 +11,14 @@ export const generateEnvLayerFromFile = async (
     existsSync(targetDir) || mkdirSync(targetDir, {recursive: true});
 
     const defaultRegion = layerConfig.defaultRegion;
-    const regions: layer_region_config = layerConfig.regions || {};
+    const regions: Record<string, layer_region_config> =
+        layerConfig.regions || {};
 
-    const mappedRegions = Object.entries(regions || {[defaultRegion]: {}}).map(
-        ([rCode, r]) =>
+    const mappedRegions = Object.entries(
+        regions ||
+            ({[defaultRegion]: {}} as Record<string, layer_region_config>),
+    ).map(
+        ([rCode, r]: [string, layer_region_config]) =>
             [
                 r,
                 `${targetDir}/main${(r?.id || rCode) === defaultRegion ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
