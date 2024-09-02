@@ -15,7 +15,6 @@ export default async (
         [`data.tf`, replace(s, {...vars, is_data_file: true})],
         [`locals.tf`, replace(s, {...vars, is_locals_file: true})],
         [`variables.tf`, replace(s, {...vars, is_variables_file: true})],
-        [`outputs.tf`, replace(s, {...vars, is_outputs_file: true})],
         [
             `providers.tf`,
             replace(s, {
@@ -35,6 +34,26 @@ export default async (
                 is_providers_file: true,
             }) as unknown as string,
         ],
+        // region outputs files
+        ...Object.entries(regions).map(
+            ([rCode, r]: [string, layer_region_config]) => {
+                const isDefault = (r?.id || rCode) === defaultRegion;
+                return [
+                    `outputs${isDefault ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
+                    replace(s, {
+                        ...vars,
+                        region: r?.id || rCode,
+                        is_default_outputs: isDefault,
+                        is_outputs_file: true,
+                        is_default_region: isDefault,
+                        psuffix: isDefault ? '' : `.${rCode}`,
+                        rsuffix: isDefault ? '' : `-${rCode}`,
+                        ...r,
+                        ...(vars?.id ? {id: vars.id} : {}),
+                    }) as unknown as string,
+                ];
+            },
+        ),
         // region main files
         ...Object.entries(regions).map(
             ([rCode, r]: [string, layer_region_config]) => {
