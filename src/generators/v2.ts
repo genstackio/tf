@@ -1,8 +1,8 @@
 import {enriched_layer_config, layer_region_config} from '../types';
-import replaceVars from '../utils/replaceVars';
+import replace from '../utils/replaceVars';
 
 export default async (
-    source: string,
+    s: string,
     {
         regions,
         defaultRegion,
@@ -11,18 +11,14 @@ export default async (
     _: enriched_layer_config,
 ) => {
     return [
-        // terraform file
-        [
-            `terraform.tf`,
-            replaceVars(source, {
-                ...vars,
-                is_terraform_file: true,
-            }) as unknown as string,
-        ],
-        // providers file
+        [`terraform.tf`, replace(s, {...vars, is_terraform_file: true})],
+        [`data.tf`, replace(s, {...vars, is_data_file: true})],
+        [`locals.tf`, replace(s, {...vars, is_locals_file: true})],
+        [`variables.tf`, replace(s, {...vars, is_variables_file: true})],
+        [`outputs.tf`, replace(s, {...vars, is_outputs_file: true})],
         [
             `providers.tf`,
-            replaceVars(source, {
+            replace(s, {
                 ...vars,
                 extra_providers: Object.entries(regions)
                     .map(([rCode, r]: [string, layer_region_config]) => {
@@ -39,32 +35,17 @@ export default async (
                 is_providers_file: true,
             }) as unknown as string,
         ],
-        // data file
-        [
-            `data.tf`,
-            replaceVars(source, {
-                ...vars,
-                is_data_file: true,
-            }) as unknown as string,
-        ],
-        // outputs file
-        [
-            `outputs.tf`,
-            replaceVars(source, {
-                ...vars,
-                is_outputs_file: true,
-            }) as unknown as string,
-        ],
-        // region files
+        // region main files
         ...Object.entries(regions).map(
             ([rCode, r]: [string, layer_region_config]) => {
                 const isMain = (r?.id || rCode) === defaultRegion;
                 return [
                     `main${(r?.id || rCode) === defaultRegion ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
-                    replaceVars(source, {
+                    replace(s, {
                         ...vars,
                         region: r?.id || rCode,
                         is_main: isMain,
+                        is_default_main: isMain,
                         is_main_file: true,
                         is_default_region: isMain,
                         psuffix: isMain ? '' : `.${rCode}`,
@@ -75,5 +56,28 @@ export default async (
                 ];
             },
         ),
-    ] as [string, string][];
+        // region sub files
+        ...Object.entries(regions).map(
+            ([rCode, r]: [string, layer_region_config]) => {
+                const isSub = (r?.id || rCode) === defaultRegion;
+                return [
+                    `sub${(r?.id || rCode) === defaultRegion ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
+                    replace(s, {
+                        ...vars,
+                        region: r?.id || rCode,
+                        is_sub: isSub,
+                        is_default_sub: isSub,
+                        is_sub_file: true,
+                        is_default_region: isSub,
+                        psuffix: isSub ? '' : `.${rCode}`,
+                        rsuffix: isSub ? '' : `-${rCode}`,
+                        ...r,
+                        ...(vars?.id ? {id: vars.id} : {}),
+                    }) as unknown as string,
+                ];
+            },
+        ),
+    ]
+        .map(x => [x[0], (x[1] as string)?.trim()])
+        .filter(x => x[1]) as [string, string][];
 };
