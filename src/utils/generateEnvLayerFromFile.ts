@@ -15,8 +15,9 @@ export const generateEnvLayerFromFile = async (
         layerConfig.regions || {};
 
     const mappedRegions = Object.entries(
-        regions ||
-            ({[defaultRegion]: {}} as Record<string, layer_region_config>),
+        regions && Object.keys(regions).length
+            ? regions
+            : ({[defaultRegion]: {}} as Record<string, layer_region_config>),
     ).map(
         ([rCode, r]: [string, layer_region_config]) =>
             [
