@@ -34,15 +34,15 @@ export const generateEnvLayerFromFile = async (
                 string,
                 string,
             ]) => {
+                const isMain = (r?.id || rCode) === defaultRegion;
                 writeFileSync(
                     targetFile,
                     replaceVars(readFileSync(sourceFile, 'utf8') as string, {
                         ...vars,
                         region: r?.id || rCode,
-                        rsuffix:
-                            (r?.id || rCode) === defaultRegion
-                                ? ''
-                                : `-${rCode}`,
+                        is_main: isMain,
+                        is_default_region: isMain,
+                        rsuffix: isMain ? '' : `-${rCode}`,
                         ...r,
                         ...(vars?.id ? {id: vars.id} : {}),
                     }) as unknown as string,
