@@ -1,6 +1,6 @@
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'fs';
 import replaceVars from './replaceVars';
-import {enriched_layer_config} from '../types';
+import {enriched_layer_config, layer_region_config} from '../types';
 
 export const generateEnvLayerFromFile = async (
     sourceFile: string,
@@ -11,27 +11,39 @@ export const generateEnvLayerFromFile = async (
     existsSync(targetDir) || mkdirSync(targetDir, {recursive: true});
 
     const defaultRegion = layerConfig.defaultRegion;
-    const regions: string[] = layerConfig.regions || [];
+    const regions: layer_region_config = layerConfig.regions || {};
 
-    const mappedRegions = (regions || [defaultRegion]).map(
-        r =>
+    const mappedRegions = Object.entries(regions || {[defaultRegion]: {}}).map(
+        ([rCode, r]) =>
             [
                 r,
-                `${targetDir}/main${r === defaultRegion ? '' : `_${r.replace(/-/g, '_')}`}.tf`,
-            ] as [string, string],
+                `${targetDir}/main${(r?.id || rCode) === defaultRegion ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
+                rCode,
+            ] as [layer_region_config, string, string],
     );
 
     const reports = await Promise.allSettled(
-        mappedRegions.map(async ([r, targetFile]: [string, string]) => {
-            writeFileSync(
-                targetFile,
-                replaceVars(readFileSync(sourceFile, 'utf8') as string, {
-                    ...vars,
-                    region: r,
-                    rsuffix: r === defaultRegion ? '' : `-${r}`,
-                }) as unknown as string,
-            );
-        }),
+        mappedRegions.map(
+            async ([r, targetFile, rCode]: [
+                layer_region_config,
+                string,
+                string,
+            ]) => {
+                writeFileSync(
+                    targetFile,
+                    replaceVars(readFileSync(sourceFile, 'utf8') as string, {
+                        ...vars,
+                        region: r?.id || rCode,
+                        rsuffix:
+                            (r?.id || rCode) === defaultRegion
+                                ? ''
+                                : `-${rCode}`,
+                        ...r,
+                        ...(vars?.id ? {id: vars.id} : {}),
+                    }) as unknown as string,
+                );
+            },
+        ),
     );
 
     const errors: {reason: Error}[] = reports.filter(

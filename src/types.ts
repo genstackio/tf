@@ -18,9 +18,13 @@ export type layer_config = {
     envs?: Record<string, unknown>;
 };
 
+export type layer_region_config = {
+    id?: string;
+    [key: string]: unknown;
+};
 export type enriched_layer_config = {
     defaultRegion: string;
-    regions?: string[];
+    regions?: Record<string, layer_region_config>;
 };
 
 export type loggable = {
