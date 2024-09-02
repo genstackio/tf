@@ -1,6 +1,6 @@
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'fs';
-import replaceVars from './replaceVars';
-import {enriched_layer_config, layer_region_config} from '../types';
+import {enriched_layer_config, generator, layer_region_config} from '../types';
+import * as generators from '../generators';
 
 export const generateEnvLayerFromFile = async (
     sourceFile: string,
@@ -13,52 +13,30 @@ export const generateEnvLayerFromFile = async (
     const defaultRegion = layerConfig.defaultRegion;
     const regions: Record<string, layer_region_config> =
         layerConfig.regions || {};
+    const format = layerConfig.format || 'v1';
+    const generator = (generators as Record<string, generator>)[format];
 
-    const mappedRegions = Object.entries(
-        regions && Object.keys(regions).length
-            ? regions
-            : ({[defaultRegion]: {}} as Record<string, layer_region_config>),
-    ).map(
-        ([rCode, r]: [string, layer_region_config]) =>
-            [
-                r,
-                `${targetDir}/main${(r?.id || rCode) === defaultRegion ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
-                rCode,
-            ] as [layer_region_config, string, string],
+    if (!generator) throw new Error(`Unsupported layer format '${format}'`);
+
+    const files = await generator(
+        readFileSync(sourceFile, 'utf8') as string,
+        {
+            regions:
+                regions && Object.keys(regions).length
+                    ? regions
+                    : ({[defaultRegion]: {}} as Record<
+                          string,
+                          layer_region_config
+                      >),
+            defaultRegion,
+        },
+        vars,
+        layerConfig,
     );
 
-    const reports = await Promise.allSettled(
-        mappedRegions.map(
-            async ([r, targetFile, rCode]: [
-                layer_region_config,
-                string,
-                string,
-            ]) => {
-                const isMain = (r?.id || rCode) === defaultRegion;
-                writeFileSync(
-                    targetFile,
-                    replaceVars(readFileSync(sourceFile, 'utf8') as string, {
-                        ...vars,
-                        region: r?.id || rCode,
-                        is_main: isMain,
-                        is_default_region: isMain,
-                        rsuffix: isMain ? '' : `-${rCode}`,
-                        ...r,
-                        ...(vars?.id ? {id: vars.id} : {}),
-                    }) as unknown as string,
-                );
-            },
-        ),
+    (files || []).map(([file, content]) =>
+        writeFileSync(`${targetDir}/${file}`, content),
     );
-
-    const errors: {reason: Error}[] = reports.filter(
-        x => x.status !== 'fulfilled',
-    ) as unknown as {reason: Error}[];
-
-    if (errors.length)
-        throw new Error(
-            `Unable to generate all env layer files for ${sourceFile}: ${errors.map((x: {reason: Error}) => x.reason.message).join('\n')}`,
-        );
 };
 
 export default generateEnvLayerFromFile;
