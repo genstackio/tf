@@ -24,6 +24,18 @@ export default async (
             `providers.tf`,
             replaceVars(source, {
                 ...vars,
+                extra_providers: Object.entries(regions)
+                    .map(([rCode, r]: [string, layer_region_config]) => {
+                        const region = r?.id || rCode;
+                        const isMain = region === defaultRegion;
+                        return isMain
+                            ? undefined
+                            : {type: 'aws', alias: rCode, region};
+                    })
+                    .filter(x => !!x)
+                    .sort((a, b) =>
+                        (a?.alias as string).localeCompare(b?.alias as string),
+                    ),
                 is_providers_file: true,
             }) as unknown as string,
         ],
@@ -55,6 +67,7 @@ export default async (
                         is_main: isMain,
                         is_main_file: true,
                         is_default_region: isMain,
+                        psuffix: isMain ? '' : `.${rCode}`,
                         rsuffix: isMain ? '' : `-${rCode}`,
                         ...r,
                         ...(vars?.id ? {id: vars.id} : {}),
