@@ -11,8 +11,8 @@ export const rawLogger: raw_logger = ({
     data: unknown;
     error?: boolean;
 }) => {
-    (type === 'message' && console[error ? 'error' : 'log']) ||
-        ((..._: unknown[]) => {})(`[${group}] ${data}`);
+    type === 'message' &&
+        (error ? console.error : console.log)(`[${group}] ${data}`);
 };
 
 export default rawLogger;
