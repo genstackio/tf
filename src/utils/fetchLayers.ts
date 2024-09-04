@@ -5,9 +5,9 @@ export const fetchLayers = async (
     sourceDir: string,
 ): Promise<fetched_layer[]> => {
     return readdirSync(sourceDir, {withFileTypes: true})
-        .filter(e => !e.isDirectory() && /.tmpl.tf$/.test(e.name))
+        .filter(e => !e.isDirectory() && /\.(tf\.ejs|tmpl\.tf)$/.test(e.name))
         .map(e => ({
-            name: e.name.replace(/\.tmpl\.tf$/, ''),
+            name: e.name.replace(/(\.tmpl\.tf|\.tf\.ejs)$/, ''),
             file: e.name,
             filePath: `${sourceDir}/${e.name}`,
         }));

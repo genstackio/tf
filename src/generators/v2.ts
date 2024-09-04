@@ -6,33 +6,71 @@ export default async (
     {
         regions,
         defaultRegion,
-    }: {regions: Record<string, layer_region_config>; defaultRegion: string},
+        format,
+    }: {
+        regions: Record<string, layer_region_config>;
+        defaultRegion: string;
+        format: string;
+    },
     vars: Record<string, unknown>,
     _: enriched_layer_config,
 ) => {
+    const defaultVars = {
+        region: '',
+        is_default_outputs: false,
+        is_outputs_file: false,
+        is_default_region: false,
+        is_terraform_file: false,
+        is_data_file: false,
+        is_locals_file: false,
+        is_variables_file: false,
+        is_providers_file: false,
+        is_main: false,
+        is_default_main: false,
+        is_main_file: false,
+        is_sub: false,
+        is_default_sub: false,
+        is_sub_file: false,
+        extra_providers: [],
+        psuffix: '',
+        rsuffix: '',
+    };
+    vars = {...vars, ...defaultVars};
     return [
-        [`terraform.tf`, replace(s, {...vars, is_terraform_file: true})],
-        [`data.tf`, replace(s, {...vars, is_data_file: true})],
-        [`locals.tf`, replace(s, {...vars, is_locals_file: true})],
-        [`variables.tf`, replace(s, {...vars, is_variables_file: true})],
+        [
+            `terraform.tf`,
+            replace(s, {...vars, is_terraform_file: true}, {format}),
+        ],
+        [`data.tf`, replace(s, {...vars, is_data_file: true}, {format})],
+        [`locals.tf`, replace(s, {...vars, is_locals_file: true}, {format})],
+        [
+            `variables.tf`,
+            replace(s, {...vars, is_variables_file: true}, {format}),
+        ],
         [
             `providers.tf`,
-            replace(s, {
-                ...vars,
-                extra_providers: Object.entries(regions)
-                    .map(([rCode, r]: [string, layer_region_config]) => {
-                        const region = r?.id || rCode;
-                        const isMain = region === defaultRegion;
-                        return isMain
-                            ? undefined
-                            : {type: 'aws', alias: rCode, region};
-                    })
-                    .filter(x => !!x)
-                    .sort((a, b) =>
-                        (a?.alias as string).localeCompare(b?.alias as string),
-                    ),
-                is_providers_file: true,
-            }) as unknown as string,
+            replace(
+                s,
+                {
+                    ...vars,
+                    extra_providers: Object.entries(regions)
+                        .map(([rCode, r]: [string, layer_region_config]) => {
+                            const region = r?.id || rCode;
+                            const isMain = region === defaultRegion;
+                            return isMain
+                                ? undefined
+                                : {type: 'aws', alias: rCode, region};
+                        })
+                        .filter(x => !!x)
+                        .sort((a, b) =>
+                            (a?.alias as string).localeCompare(
+                                b?.alias as string,
+                            ),
+                        ),
+                    is_providers_file: true,
+                },
+                {format},
+            ) as unknown as string,
         ],
         // region outputs files
         ...Object.entries(regions).map(
@@ -40,17 +78,21 @@ export default async (
                 const isDefault = (r?.id || rCode) === defaultRegion;
                 return [
                     `outputs${isDefault ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
-                    replace(s, {
-                        ...vars,
-                        region: r?.id || rCode,
-                        is_default_outputs: isDefault,
-                        is_outputs_file: true,
-                        is_default_region: isDefault,
-                        psuffix: isDefault ? '' : `.${rCode}`,
-                        rsuffix: isDefault ? '' : `-${rCode}`,
-                        ...r,
-                        ...(vars?.id ? {id: vars.id} : {}),
-                    }) as unknown as string,
+                    replace(
+                        s,
+                        {
+                            ...vars,
+                            region: r?.id || rCode,
+                            is_default_outputs: isDefault,
+                            is_outputs_file: true,
+                            is_default_region: isDefault,
+                            psuffix: isDefault ? '' : `.${rCode}`,
+                            rsuffix: isDefault ? '' : `-${rCode}`,
+                            ...r,
+                            ...(vars?.id ? {id: vars.id} : {}),
+                        },
+                        {format},
+                    ) as unknown as string,
                 ];
             },
         ),
@@ -60,18 +102,22 @@ export default async (
                 const isMain = (r?.id || rCode) === defaultRegion;
                 return [
                     `main${(r?.id || rCode) === defaultRegion ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
-                    replace(s, {
-                        ...vars,
-                        region: r?.id || rCode,
-                        is_main: isMain,
-                        is_default_main: isMain,
-                        is_main_file: true,
-                        is_default_region: isMain,
-                        psuffix: isMain ? '' : `.${rCode}`,
-                        rsuffix: isMain ? '' : `-${rCode}`,
-                        ...r,
-                        ...(vars?.id ? {id: vars.id} : {}),
-                    }) as unknown as string,
+                    replace(
+                        s,
+                        {
+                            ...vars,
+                            region: r?.id || rCode,
+                            is_main: isMain,
+                            is_default_main: isMain,
+                            is_main_file: true,
+                            is_default_region: isMain,
+                            psuffix: isMain ? '' : `.${rCode}`,
+                            rsuffix: isMain ? '' : `-${rCode}`,
+                            ...r,
+                            ...(vars?.id ? {id: vars.id} : {}),
+                        },
+                        {format},
+                    ) as unknown as string,
                 ];
             },
         ),
@@ -81,18 +127,22 @@ export default async (
                 const isSub = (r?.id || rCode) === defaultRegion;
                 return [
                     `sub${(r?.id || rCode) === defaultRegion ? '' : `_${rCode.replace(/-/g, '_')}`}.tf`,
-                    replace(s, {
-                        ...vars,
-                        region: r?.id || rCode,
-                        is_sub: isSub,
-                        is_default_sub: isSub,
-                        is_sub_file: true,
-                        is_default_region: isSub,
-                        psuffix: isSub ? '' : `.${rCode}`,
-                        rsuffix: isSub ? '' : `-${rCode}`,
-                        ...r,
-                        ...(vars?.id ? {id: vars.id} : {}),
-                    }) as unknown as string,
+                    replace(
+                        s,
+                        {
+                            ...vars,
+                            region: r?.id || rCode,
+                            is_sub: isSub,
+                            is_default_sub: isSub,
+                            is_sub_file: true,
+                            is_default_region: isSub,
+                            psuffix: isSub ? '' : `.${rCode}`,
+                            rsuffix: isSub ? '' : `-${rCode}`,
+                            ...r,
+                            ...(vars?.id ? {id: vars.id} : {}),
+                        },
+                        {format},
+                    ) as unknown as string,
                 ];
             },
         ),

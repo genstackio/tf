@@ -21,7 +21,11 @@ export type layer_config = {
 export type generated_file = [string, string];
 export type generator = (
     source: string,
-    ctx: {regions: Record<string, layer_region_config>; defaultRegion: string},
+    ctx: {
+        regions: Record<string, layer_region_config>;
+        defaultRegion: string;
+        format: string;
+    },
     vars: Record<string, unknown>,
     layerConfig: enriched_layer_config,
 ) => Promise<generated_file[]> | generated_file[];
@@ -33,6 +37,7 @@ export type enriched_layer_config = {
     defaultRegion: string;
     regions?: Record<string, layer_region_config>;
     format?: string;
+    version?: string;
 };
 
 export type loggable = {

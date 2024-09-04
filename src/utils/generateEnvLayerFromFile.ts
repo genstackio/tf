@@ -13,10 +13,12 @@ export const generateEnvLayerFromFile = async (
     const defaultRegion = layerConfig.defaultRegion;
     const regions: Record<string, layer_region_config> =
         layerConfig.regions || {};
-    const format = layerConfig.format || 'v1';
-    const generator = (generators as Record<string, generator>)[format];
+    const format = layerConfig.format || 'handlebars';
+    const version = layerConfig.version || 'v1';
+    const generator = (generators as Record<string, generator>)[version];
 
-    if (!generator) throw new Error(`Unsupported layer format '${format}'`);
+    if (!generator)
+        throw new Error(`Unsupported layer generator version '${version}'`);
 
     const files = await generator(
         readFileSync(sourceFile, 'utf8') as string,
@@ -29,6 +31,7 @@ export const generateEnvLayerFromFile = async (
                           layer_region_config
                       >),
             defaultRegion,
+            format,
         },
         vars,
         layerConfig,
