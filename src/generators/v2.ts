@@ -16,8 +16,8 @@ export default async (
     _: enriched_layer_config,
 ) => {
     const defaultVars = {
-        region: '',
-        region_code: '',
+        current_region: '',
+        current_region_code: '',
         is_default_outputs: false,
         is_outputs_file: false,
         is_default_region: false,
@@ -83,8 +83,8 @@ export default async (
                         s,
                         {
                             ...vars,
-                            region: r?.id || rCode,
-                            region_code: rCode,
+                            current_region: r?.id || rCode,
+                            current_region_code: rCode,
                             is_default_outputs: isDefault,
                             is_outputs_file: true,
                             is_default_region: isDefault,
@@ -108,8 +108,8 @@ export default async (
                         s,
                         {
                             ...vars,
-                            region: r?.id || rCode,
-                            region_code: rCode,
+                            current_region: r?.id || rCode,
+                            current_region_code: rCode,
                             is_main: isMain,
                             is_default_main: isMain,
                             is_main_file: true,
@@ -134,8 +134,8 @@ export default async (
                         s,
                         {
                             ...vars,
-                            region: r?.id || rCode,
-                            region_code: rCode,
+                            current_region: r?.id || rCode,
+                            current_region_code: rCode,
                             is_sub: isSub,
                             is_default_sub: isSub,
                             is_sub_file: true,
