@@ -17,6 +17,7 @@ export default async (
 ) => {
     const defaultVars = {
         region: '',
+        region_code: '',
         is_default_outputs: false,
         is_outputs_file: false,
         is_default_region: false,
@@ -83,6 +84,7 @@ export default async (
                         {
                             ...vars,
                             region: r?.id || rCode,
+                            region_code: rCode,
                             is_default_outputs: isDefault,
                             is_outputs_file: true,
                             is_default_region: isDefault,
@@ -107,6 +109,7 @@ export default async (
                         {
                             ...vars,
                             region: r?.id || rCode,
+                            region_code: rCode,
                             is_main: isMain,
                             is_default_main: isMain,
                             is_main_file: true,
@@ -132,6 +135,7 @@ export default async (
                         {
                             ...vars,
                             region: r?.id || rCode,
+                            region_code: rCode,
                             is_sub: isSub,
                             is_default_sub: isSub,
                             is_sub_file: true,
