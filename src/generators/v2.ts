@@ -36,6 +36,7 @@ export default async (
         extra_providers: [],
         psuffix: '',
         rsuffix: '',
+        rsuffix_explicit: '',
     };
     vars = {...vars, ...defaultVars};
     return [
@@ -91,6 +92,7 @@ export default async (
                             is_default_region: isDefault,
                             psuffix: isDefault ? '' : `.${rCode}`,
                             rsuffix: isDefault ? '' : `-${rCode}`,
+                            rsuffix_explicit: `-${rCode}`,
                             ...r,
                             ...(vars?.id ? {id: vars.id} : {}),
                         },
@@ -118,6 +120,7 @@ export default async (
                             is_default_region: isMain,
                             psuffix: isMain ? '' : `.${rCode}`,
                             rsuffix: isMain ? '' : `-${rCode}`,
+                            rsuffix_explicit: `-${rCode}`,
                             ...r,
                             ...(vars?.id ? {id: vars.id} : {}),
                         },
@@ -144,6 +147,7 @@ export default async (
                             is_default_region: isSub,
                             psuffix: isSub ? '' : `.${rCode}`,
                             rsuffix: isSub ? '' : `-${rCode}`,
+                            rsuffix_explicit: `-${rCode}`,
                             ...r,
                             ...(vars?.id ? {id: vars.id} : {}),
                         },
