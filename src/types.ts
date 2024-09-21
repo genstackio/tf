@@ -38,6 +38,7 @@ export type enriched_layer_config = {
     regions?: Record<string, layer_region_config>;
     format?: string;
     version?: string;
+    vars?: Record<string, unknown>;
 };
 
 export type loggable = {

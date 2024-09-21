@@ -33,7 +33,7 @@ export const generateEnvLayerFromFile = async (
             defaultRegion,
             format,
         },
-        vars,
+        {...vars, ...(layerConfig.vars || {})},
         layerConfig,
     );
 

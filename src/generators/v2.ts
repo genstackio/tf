@@ -7,12 +7,10 @@ export default async (
         regions,
         defaultRegion,
         format,
-        vars: layerVars,
     }: {
         regions: Record<string, layer_region_config>;
         defaultRegion: string;
         format: string;
-        vars?: Record<string, unknown>;
     },
     vars: Record<string, unknown>,
     _: enriched_layer_config,
@@ -40,7 +38,7 @@ export default async (
         rsuffix: '',
         rsuffix_explicit: '',
     };
-    vars = {...vars, ...layerVars, ...defaultVars};
+    vars = {...vars, ...defaultVars};
     return [
         [
             `terraform.tf`,
