@@ -1,4 +1,5 @@
 export CI
+export GITHUB_TOKEN
 
 build: ## Build
 	@yarn --silent build
