@@ -19,13 +19,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
             node-version: 24.x
+            registry-url: 'https://registry.npmjs.org'
             cache: yarn
-      - name: Prepare NPM Registry identity
-        uses: ohoareau/actions/npmrc-scope-authtoken-add@master
-        with:
-            scope: genstackio
-            token: ${{secrets.NPM_TOKEN}}
-            registry: registry.npmjs.org
       - name: Install
         shell: 'script -q -e -c "bash {0}"'
         run: make install
